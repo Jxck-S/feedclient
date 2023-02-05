@@ -1,19 +1,18 @@
 
 [Unit]
-Description=adsbexchange-feed
+Description=theairtraffic-mlat
 Wants=network.target
 After=network.target
 
 [Service]
-User=adsbexchange
-RuntimeDirectory=adsbexchange-feed
-ExecStart=/usr/local/share/adsbexchange/adsbexchange-feed.sh
+User=theairtraffic
+ExecStart=/usr/local/share/theairtraffic/theairtraffic-mlat.sh
 Type=simple
 Restart=always
 RestartSec=30
 StartLimitInterval=1
 StartLimitBurst=100
-SyslogIdentifier=adsbexchange-feed
+SyslogIdentifier=theairtraffic-mlat
 Nice=-1
 
 [Install]

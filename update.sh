@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #####################################################################################
-#                        ADS-B EXCHANGE SETUP SCRIPT                                #
+#                        TheAirTraffic SETUP SCRIPT                                #
 #####################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                                   #
@@ -95,10 +95,10 @@ function getGIT() {
     rm -rf "$tmp" "$tmp.folder"; return 1
 }
 
-REPO="https://github.com/adsbexchange/feedclient.git"
+REPO="https://github.com/Jxck-S/feedclient.git"
 BRANCH="master"
 
-IPATH=/usr/local/share/adsbexchange
+IPATH=/usr/local/share/theairtraffic
 GIT="$IPATH/git"
 mkdir -p $IPATH
 
@@ -121,13 +121,13 @@ if diff "$GIT/update.sh" "$IPATH/update.sh" &>/dev/null; then
     exit $?
 fi
 
-if [ -f /boot/adsb-config.txt ]; then
-    source /boot/adsb-config.txt
-    source /boot/adsbx-env
+if [ -f /boot/theairtraffic-config.txt ]; then
+    source /boot/theairtraffic-config.txt
+    source /boot/theairtraffic-env
 else
-    source /etc/default/adsbexchange
-    if ! grep -qs -e UAT_INPUT /etc/default/adsbexchange; then
-        cat >> /etc/default/adsbexchange <<"EOF"
+    source /etc/default/theairtraffic
+    if ! grep -qs -e UAT_INPUT /etc/default/theairtraffic; then
+        cat >> /etc/default/theairtraffic <<"EOF"
 
 # this is the source for 978 data, use port 30978 from dump978 --raw-port
 # if you're not receiving 978, don't worry about it, not doing any harm!
@@ -150,12 +150,12 @@ else
 fi
 
 # remove previously used folder to avoid confusion
-rm -rf /usr/local/share/adsb-exchange &>/dev/null
+rm -rf /usr/local/share/theairtraffic &>/dev/null
 
 cp "$GIT/uninstall.sh" "$IPATH"
 cp "$GIT"/scripts/*.sh "$IPATH"
 
-UNAME=adsbexchange
+UNAME=theairtraffic
 if ! id -u "${UNAME}" &>/dev/null
 then
     # 2nd syntax is for fedora / centos
@@ -182,7 +182,7 @@ echo
 bash "$IPATH/git/create-uuid.sh"
 
 VENV=$IPATH/venv
-if [[ -f /usr/local/share/adsbexchange/venv/bin/python3.7 ]] && command -v python3.9 &>/dev/null;
+if [[ -f /usr/local/share/theairtraffic/venv/bin/python3.7 ]] && command -v python3.9 &>/dev/null;
 then
     rm -rf "$VENV"
 fi
@@ -191,7 +191,7 @@ MLAT_REPO="https://github.com/adsbxchange/mlat-client.git"
 MLAT_BRANCH="master"
 MLAT_VERSION="$(git ls-remote $MLAT_REPO $MLAT_BRANCH | cut -f1 || echo $RANDOM-$RANDOM )"
 if [[ $REINSTALL != yes ]] && grep -e "$MLAT_VERSION" -qs $IPATH/mlat_version \
-    && grep -qs -e '#!' "$VENV/bin/mlat-client" && { systemctl is-active adsbexchange-mlat &>/dev/null || [[ "${MLAT_DISABLED}" == "1" ]]; }
+    && grep -qs -e '#!' "$VENV/bin/mlat-client" && { systemctl is-active theairtraffic-mlat &>/dev/null || [[ "${MLAT_DISABLED}" == "1" ]]; }
 then
     echo
     echo "mlat-client already installed, git hash:"
@@ -232,33 +232,33 @@ else
         echo "--------------------"
         echo "Installing mlat-client failed, if there was an old version it has been restored."
         echo "Will continue installation to try and get at least the feed client working."
-        echo "Please repot this error to the adsbexchange forums or discord."
+        echo "Please repot this error to the  forums or discord."
         echo "--------------------"
     fi
 fi
 
 echo 50
 
-# copy adsbexchange-mlat service file
-cp "$GIT"/scripts/adsbexchange-mlat.service /lib/systemd/system
+# copy theairtraffic-mlat service file
+cp "$GIT"/scripts/theairtraffic-mlat.service /lib/systemd/system
 
 echo 60
 
-if ls -l /etc/systemd/system/adsbexchange-mlat.service 2>&1 | grep '/dev/null' &>/dev/null; then
+if ls -l /etc/systemd/system/theairtraffic-mlat.service 2>&1 | grep '/dev/null' &>/dev/null; then
     echo "--------------------"
-    echo "CAUTION, adsbexchange-mlat is masked and won't run!"
+    echo "CAUTION, theairtraffic-mlat is masked and won't run!"
     echo "If this is unexpected for you, please report this issue"
     echo "--------------------"
     sleep 3
 else
     if [[ "${MLAT_DISABLED}" == "1" ]]; then
-        systemctl disable adsbexchange-mlat || true
-        systemctl stop adsbexchange-mlat || true
+        systemctl disable theairtraffic-mlat || true
+        systemctl stop theairtraffic-mlat || true
     else
-        # Enable adsbexchange-mlat service
-        systemctl enable adsbexchange-mlat >> $LOGFILE || true
-        # Start or restart adsbexchange-mlat service
-        systemctl restart adsbexchange-mlat || true
+        # Enable theairtraffic-mlat service
+        systemctl enable theairtraffic-mlat >> $LOGFILE || true
+        # Start or restart theairtraffic-mlat service
+        systemctl restart theairtraffic-mlat || true
     fi
 fi
 
@@ -273,9 +273,9 @@ if grep -E 'wheezy|jessie' /etc/os-release -qs; then
 fi
 READSB_VERSION="$(git ls-remote $READSB_REPO $READSB_BRANCH | cut -f1 || echo $RANDOM-$RANDOM )"
 READSB_GIT="$IPATH/readsb-git"
-READSB_BIN="$IPATH/feed-adsbx"
+READSB_BIN="$IPATH/feed-theairtraffic"
 if [[ $REINSTALL != yes ]] && grep -e "$READSB_VERSION" -qs $IPATH/readsb_version \
-    && "$READSB_BIN" -V && systemctl is-active adsbexchange-feed &>/dev/null
+    && "$READSB_BIN" -V && systemctl is-active theairtraffic-feed &>/dev/null
 then
     echo
     echo "Feed client already installed, git hash:"
@@ -308,19 +308,19 @@ fi
 
 #end compile readsb
 
-cp "$GIT"/scripts/adsbexchange-feed.service /lib/systemd/system
+cp "$GIT"/scripts/theairtraffic-feed.service /lib/systemd/system
 
 echo 82
 
-if ! ls -l /etc/systemd/system/adsbexchange-feed.service 2>&1 | grep '/dev/null' &>/dev/null; then
-    # Enable adsbexchange-feed service
-    systemctl enable adsbexchange-feed >> $LOGFILE || true
+if ! ls -l /etc/systemd/system/theairtraffic-feed.service 2>&1 | grep '/dev/null' &>/dev/null; then
+    # Enable theairtraffic-feed service
+    systemctl enable theairtraffic-feed >> $LOGFILE || true
     echo 92
-    # Start or restart adsbexchange-feed service
-    systemctl restart adsbexchange-feed || true
+    # Start or restart theairtraffic-feed service
+    systemctl restart theairtraffic-feed || true
 else
     echo "--------------------"
-    echo "CAUTION, adsbexchange-feed.service is masked and won't run!"
+    echo "CAUTION, theairtraffic-feed.service is masked and won't run!"
     echo "If this is unexpected for you, please report this issue"
     echo "--------------------"
     sleep 3
@@ -328,32 +328,32 @@ fi
 
 echo 94
 
-systemctl is-active adsbexchange-feed &>/dev/null || {
+systemctl is-active theairtraffic-feed &>/dev/null || {
     rm -f $IPATH/readsb_version
     echo "---------------------------------"
-    journalctl -u adsbexchange-feed | tail -n10
+    journalctl -u theairtraffic-feed | tail -n10
     echo "---------------------------------"
-    echo "adsbexchange-feed service couldn't be started, please report this error to the adsbexchange forum or discord."
+    echo "theairtraffic-feed service couldn't be started, please report this error to the theairtraffic forum or discord."
     echo "Try an copy as much of the output above and include it in your report, thank you!"
     echo "---------------------------------"
     exit 1
 }
 
 echo 96
-[[ "${MLAT_DISABLED}" == "1" ]] || systemctl is-active adsbexchange-mlat &>/dev/null || {
+[[ "${MLAT_DISABLED}" == "1" ]] || systemctl is-active theairtraffic-mlat &>/dev/null || {
     rm -f $IPATH/mlat_version
     echo "---------------------------------"
-    journalctl -u adsbexchange-mlat | tail -n10
+    journalctl -u theairtraffic-mlat | tail -n10
     echo "---------------------------------"
-    echo "adsbexchange-mlat service couldn't be started, please report this error to the adsbexchange forum or discord."
+    echo "theairtraffic-mlat service couldn't be started, please report this error to the theairtraffic forum or discord."
     echo "Try an copy as much of the output above and include it in your report, thank you!"
     echo "---------------------------------"
     exit 1
 }
 
 # Remove old method of starting the feed scripts if present from rc.local
-# Kill the old adsbexchange scripts in case they are still running from a previous install including spawned programs
-for name in adsbexchange-netcat_maint.sh adsbexchange-socat_maint.sh adsbexchange-mlat_maint.sh; do
+# Kill the old theairtraffic scripts in case they are still running from a previous install including spawned programs
+for name in theairtraffic-netcat_maint.sh theairtraffic-socat_maint.sh theairtraffic-mlat_maint.sh; do
     if grep -qs -e "$name" /etc/rc.local; then
         sed -i -e "/$name/d" /etc/rc.local || true
     fi
@@ -363,13 +363,13 @@ for name in adsbexchange-netcat_maint.sh adsbexchange-socat_maint.sh adsbexchang
     fi
 done
 
-# in case the mlat-client service using /etc/default/mlat-client as config is using adsbexchange as a host, disable the service
-if grep -qs 'SERVER_HOSTPORT.*feed.adsbexchange.com' /etc/default/mlat-client &>/dev/null; then
+# in case the mlat-client service using /etc/default/mlat-client as config is using theairtraffic as a host, disable the service
+if grep -qs 'SERVER_HOSTPORT.*feed.theairtraffic.com' /etc/default/mlat-client &>/dev/null; then
     systemctl disable --now mlat-client >> $LOGFILE 2>&1 || true
 fi
 
-if [[ -f /etc/default/adsbexchange ]]; then
-    sed -i -e 's/feed.adsbexchange.com,30004,beast_reduce_out,feed.adsbexchange.com,64004/feed1.adsbexchange.com,30004,beast_reduce_out,feed2.adsbexchange.com,64004/' /etc/default/adsbexchange || true
+if [[ -f /etc/default/theairtraffic ]]; then
+    sed -i -e 's/feed.theairtraffic.com,30004,beast_reduce_out,feed.theairtraffic.com,64004/feed.theairtraffic.com,30004,beast_reduce_out/' /etc/default/theairtraffic || true
 fi
 
 
@@ -384,15 +384,9 @@ Thanks for choosing to share your data with ADS-B Exchange!
 
 If you're curious, check your feed status after 5 min:
 
-https://adsbexchange.com/myip/
-http://adsbx.org/sync
+https://theairtraffic.com/feed/myip/
 
-Question? Issues? Go here:
-https://www.adsbexchange.com/forum/threads/adsbexchange-setup-scripts.631609/
-https://discord.gg/n9dGbkTtZm
 
-Webinterface to show the data transmitted? Run this command:
-sudo bash /usr/local/share/adsbexchange/git/install-or-update-interface.sh
 "
 
 INPUT_IP=$(echo $INPUT | cut -d: -f1)

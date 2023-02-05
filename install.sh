@@ -3,7 +3,7 @@ set -e
 
 REPO="https://github.com/Jxck-S/feedclient.git"
 BRANCH="master"
-IPATH=/usr/local/share/adsbexchange
+IPATH=/usr/local/share/theairtraffic
 mkdir -p $IPATH
 
 if [ "$(id -u)" != "0" ]; then

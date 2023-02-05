@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #####################################################################################
-#                        ADS-B EXCHANGE SETUP SCRIPT                                #
+#                        TheAirTraffic SETUP SCRIPT                                #
 #####################################################################################
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 #                                                                                   #
@@ -29,7 +29,7 @@
 
 set -e
 
-IPATH=/usr/local/share/adsbexchange
+IPATH=/usr/local/share/theairtraffic
 
 ## we need to install stuff that require root, check for that
 if [ "$(id -u)" != "0" ]; then
@@ -39,21 +39,7 @@ if [ "$(id -u)" != "0" ]; then
     exit 1
 fi
 
-## REFUSE INSTALLATION ON ADSBX IMAGE
 
-if [ -f /boot/adsb-config.txt ]; then
-    echo --------
-    echo "You are using the adsbx image, the feed setup script does not need to be installed."
-    echo "You should already be feeding, check here: https://adsbexchange.com/myip/"
-    echo "If the feed isn't working, check/correct the configuration using nano:"
-    echo --------
-    echo "sudo nano /boot/adsb-config.txt"
-    echo --------
-    echo "Hint for using nano: Ctrl-X to exit, Y(yes) and Enter to save."
-    echo --------
-    echo "Exiting."
-    exit 1
-fi
 
 bash "$IPATH/git/configure.sh"
 
