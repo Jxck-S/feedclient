@@ -373,7 +373,7 @@ echo "---------------------"
 ## SETUP COMPLETE
 
 ENDTEXT="
-Thanks for choosing to share your data with ADS-B Exchange!
+Thanks for choosing to share your data with TheAirTraffic!
 
 If you're curious, check your feed status after 5 min:
 
